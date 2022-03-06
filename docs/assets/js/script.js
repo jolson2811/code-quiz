@@ -46,33 +46,45 @@ $(document).ready(function () {
         $("#answer-section").attr("style", "d-flex flex-column align-items-center");
     }
 
+    var timerInterval = null;
+
     $("#answer-section").on("click", ".btn", function () {
+
         if(quizCurrentPosition == 0){
-            var timerInterval = setInterval(function(){
+            timerInterval = setInterval(function(){
+                console.log("count ", user.timerCount);
                 if(user.timerCount > 0){
                     user.timerCount--;
+                    $("#time-left").text(user.timerCount);
                 }else{
                     user.timerCount = 0;
+                    $("#time-left").text(user.timerCount);
                     clearInterval(timerInterval);
                 }
             },1000);
         }
+
         if (quizCurrentPosition > 0) {//not card one do the following
-            if (questions[quizCurrentPosition].answer == this.id) {//if the answer is the same as user click
+            if (questions[quizCurrentPosition].answer == this.id) {//answer is correct
                 user.score++;
                 alert("Correct answer");
             } else {
-                if(user.score > 0){
+                if(user.score > 0){//anser is wrong
                     user.score--;
                 }
-                alert("Incorrect answer");
+                alert("Incorrect answer, 10 seconds subtracted");
+                user.timerCount -= 10;
             }
         }
+
         console.log("User score is", user.score);
+
         quizCurrentPosition++;
+
         if (quizCurrentPosition < quizTotalLength) {
             setCard(quizCurrentPosition);
         }
+        
     });
 
 });
