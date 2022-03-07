@@ -14,20 +14,20 @@ $(document).ready(function () {
         },
         {
             title: "Question 1",
-            text: "What does the array prototype push do?",
+            text: "What does .push do?",
             buttons: ['<a id="0" href="#" class="btn btn-primary mb-4">adds to front of array</a>', '<a id="1" href="#" class="btn btn-primary mb-4">takes off first element of array</a>', '<a id="2" href="#" class="btn btn-primary mb-4">takes off last element of array</a>', '<a id="3" href="#" class="btn btn-primary mb-4">adds to array end</a>'],
             answer: 3
         },
         {
             title: "Question 2",
-            text: "What does the array prototype push do?",
-            buttons: ['<a id="0" href="#" class="btn btn-primary mb-4">adds to front of array</a>', '<a id="1" href="#" class="btn btn-primary mb-4">adds to array end</a>'],
-            answer: 1
+            text: "When invoking a function, what do you call data that is passed through?",
+            buttons: ['<a id="0" href="#" class="btn btn-primary mb-4">argument</a>', '<a id="1" href="#" class="btn btn-primary mb-4">parameter</a>'],
+            answer: 0
         },
         {
             title: "Question 3",
-            text: "What does the array prototype push do?",
-            buttons: ['<a id="0" href="#" class="btn btn-primary mb-4">takes off first element of array</a>', '<a id="1" href="#" class="btn btn-primary mb-4">takes off last element of array</a>', '<a id="2" href="#" class="btn btn-primary mb-4">adds to array end</a>'],
+            text: "What does ! operator mean?",
+            buttons: ['<a id="0" href="#" class="btn btn-primary mb-4">and</a>', '<a id="1" href="#" class="btn btn-primary mb-4">or</a>', '<a id="2" href="#" class="btn btn-primary mb-4">not</a>'],
             answer: 2
         }
     ];
@@ -43,6 +43,25 @@ $(document).ready(function () {
         $("#answer-section").html(html);
     }
 
+    function viewHistory() {
+        var locStore = JSON.parse(localStorage.getItem("quizHistory"));
+        var html = '<h5 id="question-title" class="card-title">Quiz History</h5><ol>';
+        if (locStore) {
+            $(".card-body").remove("#question-text");
+            $(".card-body").remove("#answer-section");
+            for (var i = 0; i < locStore.length; i++) {
+                html += '<li>Initials: '+locStore[i].initials+', Score: '+locStore[i].score+', Time: '+locStore[i].timerCount+'</li>';
+            }
+            html += "</ol>";
+            $(".card-body").html(html);
+            console.log(html);
+        }
+    }
+
+    $("#high-scores").on("click",function(){
+        viewHistory();
+    });
+
     function setCard(position) {
         $("#question-title").text(questions[position].title);
         $("#question-text").text(questions[position].text);
@@ -57,9 +76,18 @@ $(document).ready(function () {
     var timerInterval = null;
 
     $("#answer-section").on("click", ".btn", function () {
-
         if (this.id == "submit") {
             user.initials = $("#submit-initial").val();
+            var locStore = JSON.parse(localStorage.getItem("quizHistory"));
+            if (locStore) {
+                locStore.push(user);
+            } else {
+                locStore = [];
+                locStore.push(user);
+            }
+            localStorage.setItem("quizHistory", JSON.stringify(locStore));
+            locStore = localStorage.getItem("quizHistory");
+            viewHistory();
         } else {
             if (quizCurrentPosition == 0) {
                 timerInterval = setInterval(function () {
@@ -84,7 +112,7 @@ $(document).ready(function () {
                     user.timerCount -= 10;
                 }
             }
-            
+
             quizCurrentPosition++;
 
             if (quizCurrentPosition < quizTotalLength) {
