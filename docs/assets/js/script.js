@@ -1,7 +1,8 @@
 $(document).ready(function () {
     var user = {
         timerCount: 60,
-        score: 0
+        score: 0,
+        initials: ""
     }
     var quizCurrentPosition = 0;
     var questions = [//Array of questions that will be answered
@@ -35,6 +36,13 @@ $(document).ready(function () {
 
     setCard(quizCurrentPosition);
 
+    function finished() {
+        $("#question-title").text("Quiz complete!");
+        $("#question-text").text("Please input your initals to save your score");
+        var html = '<input id="submit-initial"></input><p>Your score: ' + user.score + '</p><a id="submit" href="#" class="btn btn-primary mb-4">Submit</a>';
+        $("#answer-section").html(html);
+    }
+
     function setCard(position) {
         $("#question-title").text(questions[position].title);
         $("#question-text").text(questions[position].text);
@@ -50,41 +58,43 @@ $(document).ready(function () {
 
     $("#answer-section").on("click", ".btn", function () {
 
-        if(quizCurrentPosition == 0){
-            timerInterval = setInterval(function(){
-                console.log("count ", user.timerCount);
-                if(user.timerCount > 0){
-                    user.timerCount--;
-                    $("#time-left").text(user.timerCount);
-                }else{
-                    user.timerCount = 0;
-                    $("#time-left").text(user.timerCount);
-                    clearInterval(timerInterval);
-                }
-            },1000);
-        }
+        if (this.id == "submit") {
+            user.initials = $("#submit-initial").val();
+        } else {
+            if (quizCurrentPosition == 0) {
+                timerInterval = setInterval(function () {
+                    if (user.timerCount > 0) {
+                        user.timerCount--;
+                        $("#time-left").text(user.timerCount);
+                    } else {
+                        user.timerCount = 0;
+                        $("#time-left").text(user.timerCount);
+                        finished();
+                        clearInterval(timerInterval);
+                    }
+                }, 1000);
+            }
 
-        if (quizCurrentPosition > 0) {//not card one do the following
-            if (questions[quizCurrentPosition].answer == this.id) {//answer is correct
-                user.score++;
-                alert("Correct answer");
-            } else {
-                if(user.score > 0){//anser is wrong
-                    user.score--;
+            if (quizCurrentPosition > 0) {//not card one do the following
+                if (questions[quizCurrentPosition].answer == this.id) {//answer is correct
+                    user.score++;
+                    alert("Correct answer");
+                } else {
+                    alert("Incorrect answer, 10 seconds subtracted");
+                    user.timerCount -= 10;
                 }
-                alert("Incorrect answer, 10 seconds subtracted");
-                user.timerCount -= 10;
+            }
+            
+            quizCurrentPosition++;
+
+            if (quizCurrentPosition < quizTotalLength) {
+                setCard(quizCurrentPosition);
+            }
+            if (quizCurrentPosition == quizTotalLength) {
+                finished();
+                clearInterval(timerInterval);
             }
         }
-
-        console.log("User score is", user.score);
-
-        quizCurrentPosition++;
-
-        if (quizCurrentPosition < quizTotalLength) {
-            setCard(quizCurrentPosition);
-        }
-        
     });
 
 });
